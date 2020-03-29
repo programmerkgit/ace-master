@@ -1,5 +1,7 @@
-class UndoManager {
+class Range {
+}
 
+class Editor {
 }
 
 class EditSession {
@@ -7,12 +9,15 @@ class EditSession {
     }
 
     setUndoManager(manager: UndoManager) {
-
     }
 }
 
-class Editor {
+class UndoManager {
 }
+
+class Renderer {
+}
+
 
 class Ace {
     createEditSession(text: Document | string, mode: any): EditSession {
@@ -27,11 +32,11 @@ class Ace {
     edit(element: Element | string, options: any): void {
         /* set el */
         let el: Element | null;
-        if (typeof element === "string") {
+        if (typeof element === 'string') {
             /* if element is string, get element by id */
             el = document.getElementById(element);
             if (!el)
-                throw new Error("ace.edit can't find div #" + element);
+                throw new Error('ace.edit can\'t find div #' + element);
         } else {
             el = element;
         }
@@ -40,23 +45,23 @@ class Ace {
 
         }
 
-        let value = "";
+        let value = '';
         if (/input|textarea/i.test(el.tagName)) {
             /* inputかtextareaの場合、pre要素に置き換える */
             const oldNode = el;
             value = (oldNode as (HTMLInputElement | HTMLTextAreaElement)).value;
-            el = document.createElement("pre");
+            el = document.createElement('pre');
             if (oldNode.parentElement) {
                 oldNode.parentElement && oldNode.parentElement.replaceChild(el, oldNode);
             } else {
-                throw new Error("root element shouldn't be ace editor target.");
+                throw new Error('root element shouldn\'t be ace editor target.');
             }
         } else {
-            value = el.textContent || "";
-            el.innerHTML = "";
+            value = el.textContent || '';
+            el.innerHTML = '';
         }
 
-        window.addEventListener("resize", () => {
+        window.addEventListener('resize', () => {
             /* TODO: env.onResize eidor.resize */
         });
         /* editor.ondestory, remove listnner of winwdow */
