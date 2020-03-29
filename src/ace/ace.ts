@@ -75,14 +75,10 @@ class Ace {
     edit(element: string, options: any): Editor
     edit(element: Element, options: any): Editor
     edit(element: Element | string, options: any): Editor {
+
         /* set element */
-        let el: Element;
-        if (typeof element === 'string') {
-            el = Ace.getElementByIdOrThrow(element);
-        } else {
-            el = element;
-        }
-        /* todo what is el.env.editor? el.env.editor = Editor */
+        let el: Element = typeof element === 'string' ?
+            Ace.getElementByIdOrThrow(element) : element;
         if (Ace.isAceElement(el)) {
             return (el as any).env.editor;
         }
