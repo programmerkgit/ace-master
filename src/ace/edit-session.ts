@@ -1,4 +1,4 @@
-import { Event, EventEmitter } from './event-emitter';
+import {Event, EventEmitter} from './event-emitter';
 
 const initialFoldData: any[] = [];
 initialFoldData.toString = function () {
@@ -7,6 +7,44 @@ initialFoldData.toString = function () {
 const config: any = {};
 
 export class EditSession extends EventEmitter {
+    setDocument(doc: Document) {
+        /* clearOld Document */
+        this.clearOldDocument();
+        /* setDocument */
+        this.setNewDocument(doc);
+        /* setDocument on bgTokenizer */
+        this.setDocumentOnTokenizer(doc);
+        /* reset Cache */
+        this.resetCaches();
+    }
+
+    private setDocumentOnTokenizer(doc: Document) {
+        if (this.bgTokenizer) {
+            this.bgTokenizer.setDocument(doc);
+        }
+    }
+
+    resetCaches() {
+    }
+
+    private getDocument(): Document {
+        return this.doc;
+    }
+
+    private clearOldDocument() {
+        /* onChangeを削除 */
+        if (this.doc) {
+            this.doc.removeListener('change', this.onChange);
+        }
+    }
+
+    private setNewDocument(doc: Document) {
+        this.doc = doc;
+        doc.addEventListener('change', this.onChange);
+    }
+
+    private onChange: any;
+
     static uid = 0;
     id = 'editor' + ++EditSession.uid;
     docRowCache: any[] = [];
@@ -122,7 +160,7 @@ export class EditSession extends EventEmitter {
         /* ?? what is val and cacheArray[mid] */
         while (low <= hi) {
             const mid = (low + hi) >> 1;
-            const c = cacheArray[ mid ];
+            const c = cacheArray[mid];
             if (val < c) {
                 hi = mid - 1;
             } else if (val === c) {
