@@ -99,8 +99,6 @@ class Ace {
     /**
      * element is identifier or element
      * */
-    edit(element: string, options: any): Editor
-    edit(element: Element, options: any): Editor
     edit(element: Element | string, options: any): Editor {
 
         /* set element */
