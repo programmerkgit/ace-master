@@ -51,7 +51,7 @@ class Renderer {
 
 
 class Ace {
-    createEditSession(text: Document | string, mode: any): EditSession {
+    createEditSession(text: Document | string, mode?: any): EditSession {
         /* Edit sessionを作るとともに  undomanagerをセット。 */
         const doc = new EditSession(text, mode);
         doc.setUndoManager(new UndoManager());
@@ -69,6 +69,33 @@ class Ace {
         return el && (el as any).env && (el as any).env.editor instanceof Editor;
     }
 
+    static isFormElement(el: Element): boolean {
+        return /input|textarea/i.test(el.tagName);
+    }
+
+    static getValue(el: Element): string {
+        if (this.isFormElement(el)) {
+            return (el as (HTMLInputElement | HTMLTextAreaElement)).value;
+        } else {
+            return el.textContent || '';
+        }
+    }
+
+    static initializeEditorElement(el: Element): Element {
+        if (Ace.isFormElement(el)) {
+            const oldNode = el;
+            el = document.createElement('pre');
+            if (oldNode.parentElement) {
+                oldNode.parentElement && oldNode.parentElement.replaceChild(el, oldNode);
+            } else {
+                throw new Error('root element shouldn\'t be ace editor target.');
+            }
+        } else {
+            el.innerHTML = '';
+        }
+        return el;
+    }
+
     /**
      * element is identifier or element
      * */
@@ -83,21 +110,11 @@ class Ace {
             return (el as any).env.editor;
         }
 
-        let value = '';
-        if (/input|textarea/i.test(el.tagName)) {
-            /* inputかtextareaの場合、pre要素に置き換える */
-            const oldNode = el;
-            value = (oldNode as (HTMLInputElement | HTMLTextAreaElement)).value;
-            el = document.createElement('pre');
-            if (oldNode.parentElement) {
-                oldNode.parentElement && oldNode.parentElement.replaceChild(el, oldNode);
-            } else {
-                throw new Error('root element shouldn\'t be ace editor target.');
-            }
-        } else {
-            value = el.textContent || '';
-            el.innerHTML = '';
-        }
+        const value = Ace.getValue(el);
+        el = Ace.initializeEditorElement(el);
+
+        /* todo: know createEditSession */
+        const doc = this.createEditSession(value);
 
         window.addEventListener('resize', () => {
             /* TODO: env.onResize eidor.resize */
