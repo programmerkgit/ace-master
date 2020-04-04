@@ -1,4 +1,4 @@
-import {Event, EventEmitter} from './event-emitter';
+import {Event, EventEmitter} from './lib/event-emitter';
 
 const initialFoldData: any[] = [];
 initialFoldData.toString = function () {

@@ -2,7 +2,7 @@
 
 type Cell = any;
 
-import {EventEmitter} from "./event-emitter";
+import {EventEmitter} from "./lib/event-emitter";
 
 /* 何故EventEmitterなのか */
 export class Gutter extends EventEmitter {

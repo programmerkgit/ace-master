@@ -15,6 +15,26 @@
  * exports.config = require("./config");
  */
 
+/** Very Important Part. Delegate all focus to the background text area.
+ * All we see is created by logical process. what we are editing is not what we are editting.
+ * Background structure is editted.
+ * All element is automatically created in the foront.
+ * selection is on the background and
+*
+* Brings the current `textInput` into focus.
+this.focus = function () {
+    // focusing after timeout is not needed now, but some code using ace
+    // depends on being able to call focus when textarea is not visible,
+    // so to keep backwards compatibility we keep this until the next major release
+    var _self = this;
+    setTimeout(function () {
+        if (!_self.isFocused())
+            _self.textInput.focus();
+    });
+    this.textInput.focus();
+};
+*/
+
 class Range {
 }
 

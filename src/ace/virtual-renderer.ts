@@ -1,4 +1,4 @@
-import {EventEmitter} from "./event-emitter";
+import {EventEmitter} from "./lib/event-emitter";
 
 
 type Theme = string;

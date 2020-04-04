@@ -1,4 +1,4 @@
-import { EventEmitter } from './event-emitter';
+import { EventEmitter } from './lib/event-emitter';
 import { Range } from './range';
 import { applyDelta } from './apply-delta';
 
