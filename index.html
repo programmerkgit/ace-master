@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
@@ -67,7 +67,7 @@
                                 primary editor for <a href="https://c9.io">Cloud9 IDE</a>
                                 and is the successor of the Mozilla Skywriter (Bespin) project.
                             </p>
-                            
+
                                 <pre id="ace_editor_demo" style="opacity:0">/**
  * In fact, you're looking at ACE right now. Go ahead and play with it!
  *
@@ -110,7 +110,7 @@ console.log(addResult);
                             <h2>Get the Open-Source Code</h2>
                             <p>Ace is a community project. We actively encourage and support
                                 contributions! The Ace source code is <a href="https://github.com/ajaxorg/ace">hosted on GitHub</a>
-                                and released under the BSD license &dash; 
+                                and released under the BSD license &dash;
                                 very simple and friendly to all kinds of projects, whether open-source
                                 or not. Take charge of your editor and add your favorite language
                                 highlighting and keybindings!
@@ -124,7 +124,7 @@ console.log(addResult);
                                 the editor component of <a href="https://c9.io">Cloud9 IDE</a>
                                 and uses the DOM for rendering. After the release of Ace at
                                 <a href="https://www.youtube.com/watch?v=hN_7tAKh0dM" title="[JSConfEU 2010] Fabian Jakobs: Kick ass code editing and end to end JavaScript debugging">JSConf.eu 2010</a>
-                                in Berlin the Skywriter team decided to merge Ace with a simplified 
+                                in Berlin the Skywriter team decided to merge Ace with a simplified
                                 version of Skywriter's plugin system and some of Skywriter&apos;s
                                 extensibility points. All these changes have been merged back to Ace
                                 now, which supersedes Skywriter. Both <a href="https://c9.io">Cloud9 IDE</a>
@@ -141,14 +141,14 @@ console.log(addResult);
                         </div>
                         <div class="tab-pane fade active in" id="embedding">
                             <h1>Embedding Ace in Your Site</h1>
-                            <p>Ace can be easily embedded into a web page. Get prebuilt version of ace from 
+                            <p>Ace can be easily embedded into a web page. Get prebuilt version of ace from
                             <a href="https://github.com/ajaxorg/ace-builds/">ace-builds</a> repository and use the code below:</p>
                                 <pre id="embedded_ace_code" style="opacity:0">&lt;!DOCTYPE html>
 &lt;html lang="en">
 &lt;head>
 &lt;title>ACE in Action&lt;/title>
 &lt;style type="text/css" media="screen">
-    #editor { 
+    #editor {
         position: absolute;
         top: 0;
         right: 0;
@@ -163,12 +163,17 @@ console.log(addResult);
     var x = "All this is syntax highlighted";
     return x;
 }&lt;/div>
-    
+
 &lt;script src="/ace-builds/src-noconflict/ace.js" type="text/javascript" charset="utf-8">&lt;/script>
 &lt;script>
     var editor = ace.edit("editor");
     editor.setTheme("ace/theme/monokai");
     editor.session.setMode("ace/mode/javascript");
+    editor.setOptions({
+        enableBasicAutocompletion: true,
+        enableSnippets: true,
+        enableLiveAutocompletion: false
+    })
 &lt;/script>
 &lt;/body>
 &lt;/html></pre>
@@ -176,19 +181,19 @@ console.log(addResult);
                                 common operations, such as setting a different language mode or
                                 getting the contents from the editor.
                             </p>
-                            <h2>Loading Ace from a Local URL</h2>                            
+                            <h2>Loading Ace from a Local URL</h2>
                             <p>If you want to clone and host Ace locally you can
                                 use one of the <a href="https://github.com/ajaxorg/ace-builds/">pre-packaged versions</a>. Just copy
                                 one of <code>src*</code> subdirectories somewhere into your project, or use RequireJS to load the
                                 contents of <a href="https://github.com/ajaxorg/ace/tree/master/lib/ace">lib/ace</a> folder as <code>ace</code>:
                             </p>
-			    <h2>Loading Ace from a CDN</h2>                            
+			    <h2>Loading Ace from a CDN</h2>
                             <p>The packaged version can also be loaded from CDN's such as <a href="https://pagecdn.com/lib/ace">PageCDN</a>, <a href="http://www.jsdelivr.com/#!ace">jsDelivr</a> or <a href="http://cdnjs.com/libraries/ace/">cdnjs</a>.
                             </p>
                         </div>
                         <div class="tab-pane fade" id="howto">
                             <h1>Working with Ace</h1>
-                            <p><em>In all of these examples Ace has been invoked 
+                            <p><em>In all of these examples Ace has been invoked
                                 as shown in the <a href="#nav=embedding">embedding guide</a>.</em>
                             </p>
                             <h2>Configuring the editor</h2>
@@ -230,7 +235,7 @@ editor.getOption("optionName");
                                     in <code class="javascript">editor.session</code>. This means you can grab the
                                     session, store it in a var, and set the editor to another session (e.g. a tabbed editor).</p>
                                 <p>You might accomplish this like so:</p>
-                                
+
                                 <pre><code class="javascript">var EditSession = require("ace/edit_session").EditSession;
 var js = new EditSession("some js code");
 var css = new EditSession(["some", "css", "code here"]);
@@ -270,11 +275,11 @@ editor.session.getTextRange(editor.getSelectionRange()); </code></pre>
                             <pre><code class="javascript">editor.setReadOnly(true);  // false to make it editable</code></pre>
                             <h3>Using undo manager</h3>
                             <p>To group undo delta of the next edit with the previous one set `mergeUndoDeltas` to true</p>
-                            <pre><code class="language-javascript">editor.session.mergeUndoDeltas = true; 
+                            <pre><code class="language-javascript">editor.session.mergeUndoDeltas = true;
 editor.session.insert({row: 0, column:0}, Date()+"");</code></pre>
 
                             <p>To start new undo group use `markUndoGroup` method</p>
-                            <pre><code class="language-javascript">editor.insertSnippet("a$0b"); 
+                            <pre><code class="language-javascript">editor.insertSnippet("a$0b");
 editor.session.markUndoGroup(); 
 editor.insertSnippet("x$0y");</code></pre>
                             <p>To disable undo of a an edit in a collaborative editor</p>
@@ -542,7 +547,7 @@ var fonts = lang.arrayToMap(
 };</code></pre>
                             <p>In this extremely short sample, we're defining some highlighting rules for when Ace detects a <code>&lt;![CDATA</code> tag. When one is encountered, the tokenizer moves from <code>start</code> into the <code>cdata</code> state. It remains there, applying the <code>text</code> token to any string it encounters. Finally, when it hits a closing <code>]&gt;</code> symbol, it returns to the <code>start</code> state and continues to tokenize anything else.</p>
                             <h2>Using the TMLanguage Tool</h2>
-                            <p>There is a tool that 
+                            <p>There is a tool that
                                 will take an existing <em>tmlanguage</em> file and do its best to convert it into Javascript for Ace to consume. Here's what you need to get started:
                             </p>
                             <ol>
@@ -717,7 +722,7 @@ if (match) {
                                 <div id="sidebarContainer" class="span2">
                                     <div id="sidebar">
                                         <div id="well">
-                                            
+
                                             <ul class="menu">
                                                 <li>
                                                     <div class="menu-item"><a href="./api/ace.html" class="menuLink namespace">Ace</a></div>
@@ -769,8 +774,8 @@ if (match) {
                                     <div id="documentation" class="span7">
                                     <h1>Ace API Reference</h1>
                                     <p>Welcome to the Ace API Reference!</p>
-                                    <p>On the left, you'll find a list of all of our currently documented classes. 
-                                        These is not a complete set of classes, but rather, the "core" set. For more 
+                                    <p>On the left, you'll find a list of all of our currently documented classes.
+                                        These is not a complete set of classes, but rather, the "core" set. For more
                                         information on how to work with Ace, check out the <a href="#nav=embedding">embedding guide</a>.
                                     </p>
                                     <p>Below is an ERD diagram describing some fundamentals about how the internals of Ace works:</p>
@@ -798,7 +803,7 @@ if (match) {
                                         style="left: -11px;top:-12px; width:122px" />
                                     <a href="https://github.com/ajaxorg/cloud9">Cloud9 IDE</a>
                                 </li>
-                                
+
                                 <li>
                                     <img lazy-src="doc/site/images/codecademy-logo.png"
                                         style="left: -5px; top: 10px;" />
@@ -836,7 +841,7 @@ if (match) {
                                     <img lazy-src="doc/site/images/sassmeister-logo.png"
                                         style="left: 10px;top: -5px;width: 80px;" />
                                     <a href="http://sassmeister.com/">SassMeister</a>
-                                </li> 
+                                </li>
                                 <li>
                                     <img lazy-src="doc/site/images/sx-logo.png"
                                         style="left: -11px; top: -12px;">
@@ -852,7 +857,7 @@ if (match) {
                                         background: url(https://lively-web.org/core/media/lively-web-logo.png) no-repeat;
                                         position: absolute; left: -5px; height: 71px; width: 103px; background-size: 390px;
                                         background-position: 19px;"></div>
-                                    
+
                                     <a href="http://lively-web.org">Lively Web</a>
                                 </li>
                                 <li>
@@ -893,7 +898,7 @@ if (match) {
                                     <a href="http://getcrunch.co/">Crunch</a>
                                 </li>
                                 <li>
-                                    <img lazy-src="https://drivenotepad.github.io/images/icon-128.png" 
+                                    <img lazy-src="https://drivenotepad.github.io/images/icon-128.png"
                                         style="left: 9px; top: -5px; width: 84px">
                                     <a href="https://drivenotepad.appspot.com/support">Drive Notepad</a>
                                 </li>
@@ -1175,7 +1180,7 @@ if (match) {
                                     <div class="text-logo" style="font-size:22px;text-shadow:none;margin-top:13px">Code-Fight.Club</div>
                                     <a href="http://code-fight.club">Code-Fight.Club</a>
                                 </li>
-                                
+
                                 <li>
                                     <a href="http://www.wavemaker.com/">WaveMaker</a>
                                 </li>
@@ -1185,7 +1190,7 @@ if (match) {
                                 <li>
                                     <a href="http://ext.radiantcms.org/extensions/264-ace">Radiant CMS</a>
                                 </li>
-                                
+
                                 <li>
                                     <div class="text-logo">Semantic Ui</div>
                                     <a href="http://semantic-ui.com/">Semantic Ui</a>

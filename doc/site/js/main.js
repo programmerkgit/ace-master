@@ -27,11 +27,13 @@ $(function() {
         ace.config.loadModule("ace/ext/language_tools", function() {
             embedded_editor.setOptions({
                 enableSnippets: true,
-                enableBasicAutocompletion: true
+                enableBasicAutocompletion: true,
+                enableLiveAutocompletion: true
             });
             editor.setOptions({
                 enableSnippets: true,
-                enableBasicAutocompletion: true
+                enableBasicAutocompletion: true,
+                enableLiveAutocompletion: true
             });
         });
     } else {

@@ -2,15 +2,35 @@
  * Represents a Editor.
  * @constructor
  */
-import {Ace} from "../../ace";
-import VirtualRenderer = Ace.VirtualRenderer;
+import { VirtualRenderer } from './virtual-renderer';
+import { EditSession } from './edit-session';
+import { EventEmitter } from './lib/event-emitter';
 
-export class Editor {
+export class Editor extends EventEmitter {
     static $uid = 0;
-    private id = "editor" + ++Editor.$uid;
+    renderer: VirtualRenderer;
+    mouseHandler = {
+        focusTimeout: 0
+    };
+    highlightTagPending: boolean = false;
+    cursorLayer?: HTMLElement;
+    session?: EditSession;
+    private id = 'editor' + ++Editor.$uid;
 
-    constructor(renderer: VirtualRenderer, session: EditSession) {
+    constructor(renderer: VirtualRenderer, session?: EditSession) {
+        super();
+        this.renderer = renderer;
         /* each editor should be unique */
+    }
+
+    setOption(key: string, value: boolean | number) {
+
+    }
+
+    setHighlightActiveLine(option: boolean) {
+    }
+
+    setShowPrintMargin(option: boolean) {
     }
 
     /*
