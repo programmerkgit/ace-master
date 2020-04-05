@@ -1,6 +1,7 @@
-define("ace/ext/code_lens",["require","exports","module","ace/line_widgets","ace/lib/lang","ace/lib/dom","ace/editor","ace/config"], function(require, exports, module) {
+define("ace/ext/code_lens",["require","exports","module","ace/line_widgets","ace/lib/event","ace/lib/lang","ace/lib/dom","ace/editor","ace/config"], function(require, exports, module) {
 "use strict";
 var LineWidgets = require("../line_widgets").LineWidgets;
+var event = require("../lib/event");
 var lang = require("../lib/lang");
 var dom = require("../lib/dom");
 
@@ -125,7 +126,7 @@ function attachToEditor(editor) {
         if (command)
             editor.execCommand(command.id, command.arguments);
     };
-    editor.container.addEventListener("click", editor.$codeLensClickHandler);
+    event.addListener(editor.container, "click", editor.$codeLensClickHandler, editor);
     editor.$updateLenses = function() {
         var session = editor.session;
         if (!session) return;
