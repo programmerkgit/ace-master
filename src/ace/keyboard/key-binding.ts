@@ -1,8 +1,16 @@
 export class KeyBinding {
+    private defaultHandler: any;
+    private readonly editor: any;
+    private readonly handlers: any[] = [];
+
     constructor(editor: any) {
         this.editor = editor;
         /* what is set default handler?? */
         this.setDefaultHandler(editor.commands);
+    }
+
+    private get data() {
+        return {editor: this.editor};
     }
 
     setDefaultHandler(kb: any) {
@@ -14,7 +22,7 @@ export class KeyBinding {
     addKeyboardHandler = (kb: any, pos: any) => {
         /* what is kb */
         if (!kb) return;
-        if (typeof kb == "function" && !kb.handleKeyboard) kb.handleKeyboard = kb;
+        if (typeof kb == 'function' && !kb.handleKeyboard) kb.handleKeyboard = kb;
         const i = this.handlers.indexOf(kb);
         if (i != -1) this.handlers.splice(i, 1);
         if (pos == undefined) this.handlers.push(kb);
@@ -36,18 +44,20 @@ export class KeyBinding {
             kb.attach(this.editor);*/
     };
 
+    onTextInput(text: string) {
+        return this.callKeyboardHandlers(-1, text);
+    }
+
     removeKeyboardHandler(kb: any) {
 
     }
 
-    private defaultHandler: any;
+    private callKeyboardHandlers(hashId: number, keyString: string, keyCode?: string, e?: Event): boolean {
+        let success = false;
+        let toExecute;
+        const commands = this.editor.commands;
+        /* depends on commands of editor */
+        return success;
 
-
-    private readonly editor: any;
-
-    private get data() {
-        return {editor: this.editor};
     }
-
-    private readonly handlers: any[] = [];
 }

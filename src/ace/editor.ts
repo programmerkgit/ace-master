@@ -33,6 +33,10 @@ export class Editor extends EventEmitter {
     setShowPrintMargin(option: boolean) {
     }
 
+    onTextInput(text: string, composition: boolean) {
+
+    }
+
     /*
        * var container = renderer.getContainerElement();
        this.commands = new CommandManager(useragent.isMac ? "mac" : "win", defaultCommands);
