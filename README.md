@@ -1,7 +1,7 @@
 ## TO-LEARN
 - [ ] Learn editor.textInput
 - [x] keyboard/keybindings.callKeyboardHandlers
-- [?] keyboard/keybindings.handlers.handleKeyboard
+- [ ] keyboard/keybindings.handlers.handleKeyboard
 - [x] editor.commands
 - [x] commandManager
 - [x] editor.defaultCommands
