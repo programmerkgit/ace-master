@@ -1,23 +1,32 @@
 import { EventEmitter } from './lib/event-emitter';
 import { Range } from './range';
 import { applyDelta } from './apply-delta';
+import { RegexRule } from './mode/rule';
 
-export type Point = {
+export type Position = {
     row: number,
     column: number
 }
 
 export type Delta = {
     action: 'insert' | 'remove',
-    lines: string[],
-    start: Point,
-    end: Point
+    $lines: string[],
+    start: Position,
+    end: Position
 }
 
+/**
+ * Document contains the text of the document.
+ * Document can be attached to several [[EditSession `EditSession`]]s.
+ *
+ * At its core, `Document`s are just an array of strings, with each row in the document matching up to the array index.
+ *
+ * */
 export class Document extends EventEmitter {
-    private readonly lines = [ '' ];
+    tokenArray: string[] = [];
+    private readonly $lines = [ '' ];
     private autoNewLine: string = '';
-    private newLineMode = 'auto';
+    private $newLineMode = 'auto';
 
     constructor(lines: string | string[]) {
         super();
@@ -27,17 +36,53 @@ export class Document extends EventEmitter {
 
         }
         /* ensure line has at least one char */
-        if (this.lines.length === 0) {
-            this.lines = [ '' ];
+        if (this.$lines.length === 0) {
+            this.$lines = [ '' ];
         }
     }
 
     getLine(row: number): string {
-        return this.lines[ row ] || '';
+        return this.$lines[ row ] || '';
     }
 
+    $applyToken = function (this: RegexRule, str: string) {
+        const values = this.splitRegex.ecec(str).slice(1);
+        const types = this.token.apply(this, values);
+        if (typeof types === 'string')
+            return [ {type: types, value: str} ];
+        const tokens: { type: string, value: string }[] = [];
+        for (let i = 0, l = types.length; i < l; i++) {
+            if (values[ i ])
+                tokens[ tokens.length ] = {
+                    type: types[ i ],
+                    value: values[ i ]
+                };
+        }
+        return tokens;
+    };
+
+    $arrayTokens(str: string): { type: string, value: string }[] {
+        const tokens = [] as { type: string, value: string }[];
+        const values = this.splitRegex.exec(str);
+        const types = this.tokenArray;
+        for (let i = 0, l = types.length; i < l; i++) {
+            if (values[ i + 1 ])
+                tokens[ tokens.length ] = {
+                    type: types[ i ],
+                    value: values[ i + 1 ]
+                };
+        }
+        return tokens;
+    }
+
+    /**
+     * Returns an array of strings of the rows between `firstRow` and `lastRow`.
+     * This function is inclusive of `lastRow`.
+     * @param firstRow The first row index to retrieve
+     * @param lastRow The final row index to retrieve
+     **/
     getLines(firstRow: number, lastRow: number): string[] {
-        return this.lines.slice(firstRow, lastRow + 1);
+        return this.$lines.slice(firstRow, lastRow + 1);
     }
 
     /**
@@ -48,10 +93,10 @@ export class Document extends EventEmitter {
     }
 
     getLength(): number {
-        return this.lines.length;
+        return this.$lines.length;
     }
 
-    positionToIndex(pos: Point, startRow: number = 0) {
+    positionToIndex(pos: Position, startRow: number = 0) {
         const lines = this.getAllLines();
         const newlineLength = this.getNewLineCharacter().length;
         let index = 0;
@@ -75,7 +120,7 @@ export class Document extends EventEmitter {
     }
 
     getNewLineCharacter(): string {
-        switch (this.newLineMode) {
+        switch (this.$newLineMode) {
             case 'windows':
                 return '\r\n';
             case 'unix':
@@ -86,8 +131,8 @@ export class Document extends EventEmitter {
     }
 
     setNewLineMode(newLineMode: string) {
-        if (this.newLineMode !== newLineMode) {
-            this.newLineMode = newLineMode;
+        if (this.$newLineMode !== newLineMode) {
+            this.$newLineMode = newLineMode;
             this.signal('changeNewLineMode');
         }
     }
@@ -104,7 +149,7 @@ export class Document extends EventEmitter {
         }
     };
 
-    insertMergedLines(position: Point, lines: string[]) {
+    insertMergedLines(position: Position, lines: string[]) {
         const start = this.clippedPos(position.row, position.column);
         const end = {
             row: start.row + lines.length - 1,
@@ -119,17 +164,17 @@ export class Document extends EventEmitter {
      **/
     applyDelta(delta: Delta, doNotValidate: boolean) {
         // An empty range is a NOOP.
-        if (delta.action === 'insert' && delta.lines.length <= 1 && !delta.lines[ 0 ]) {
+        if (delta.action === 'insert' && delta.$lines.length <= 1 && !delta.$lines[ 0 ]) {
             return;
         }
         if (delta.action === 'remove' && !Range.isSamePoint(delta.start, delta.end)) {
             return;
         }
-        if (delta.action === 'insert' && delta.lines.length > 20000) {
+        if (delta.action === 'insert' && delta.$lines.length > 20000) {
             this.splitAndapplyLargeDelta(delta, 20000);
             return;
         }
-        applyDelta(this.lines, delta, doNotValidate);
+        applyDelta(this.$lines, delta, doNotValidate);
         this.signal('change', delta);
     }
 
@@ -144,16 +189,112 @@ export class Document extends EventEmitter {
      *  edf
      *  ghi]
      * row 1, column 4 => 1, 3
-     * row 5, column 8 => 3, 3
-     * row 3, column 2 => 3, 2
-     * row 2, column 5 => 3, 5
+     * row 5, column 8 => 2, 3
+     * row 3, column 2 => 2, 2
+     * row 2, column 5 => 2, 3
+     * row undefined, column undefined => 3, 3
      * */
-    clippedPos(row: number, column: number): Point {
+    clippedPos(row: number, column: number): Position {
+        /* Linesの中におさまるぽじしょん */
         const length = this.getLength();
         row = Math.min(Math.max(row, 0), this.getLength());
         let line = this.getLine(row);
         column = Math.min(Math.max(column, 0), line.length);
         return {row, column};
     }
+
+    setValue(text: string) {
+        const len = this.getLength() - 1;
+        this.remove(new Range(0, 0, len, this.getLine(len).length));
+        this.insert({row: 0, column: 0}, text);
+    }
+
+    insert(position, text: string) {
+        if (this.getLength() <= 1)
+            this.$detectNewLine(text);
+        return this.insertMergedLines(position, this.$split(text));
+    }
+
+    remove(rage: Range) {
+    }
+
+    insertMergedLines(position, lines: any[]) {
+
+    }
+
+    /**
+     * clone position
+     * @param position position to be cloned.
+     * */
+    clonePos(position: Position): Position {
+        return {row: position.row, column: position.column};
+    }
+
+    /**
+     * create position from row, column
+     * */
+    pos(row: number, column: number): Position {
+        return {row, column};
+    }
+
+
+    /**
+     * Converts the `{row, column}` position in a document to the character's index.
+     *
+     * Index refers to the "absolute position" of a character in the document. For example:
+     *
+     * ```javascript
+     * var x = 0; // 10 characters, plus one for newline
+     * var y = -1;
+     * ```
+     *.
+     * Here, `y` is an index 15: 11 characters for the first row, and 5 characters until `y` in the second.
+     *
+     * @param {Object} pos The `{row, column}` to convert
+     * @param {Number} startRow=0 The row from which to start the conversion
+     * @returns {Number} The index position in the document
+     */
+    positionToIndex(pos: Position, startRow: number = 0): number {
+        const lines = this.$lines || this.getAllLines();
+        const newLineLength = this.getNewLineCharacter().length;
+        let index = 0;
+
+        const row = Math.min(pos.row, lines.length);
+
+        for (let i = startRow; i < row; i++)
+            index += lines[ i ].length + newLineLength;
+
+        return index + pos.column;
+
+    }
+
+    /**
+     * Converts an index position in a document to a `{row, column}` object.
+     *
+     * Index refers to the "absolute position" of a character in the document. For example:
+     *
+     * ```javascript
+     * var x = 0; // 10 characters, plus one for newline
+     * var y = -1;
+     * ```
+     *
+     * Here, `y` is an index 15: 11 characters for the first row, and 5 characters until `y` in the second.
+     *
+     * @param {Number} index An index to convert
+     * @param {Number} startRow=0 The row from which to start the conversion
+     * @returns {Object} A `{row, column}` object of the `index` position
+     */
+    indexToPosition(index: number, startRow: number = 0) {
+        const lines = this.$lines || this.getAllLines();
+        const newlineLength = this.getNewLineCharacter().length;
+        let l: number = 0;
+        for (let i = startRow, l = lines.length; i < l; i++) {
+            index -= lines[ i ].length + newlineLength;
+            if (index < 0)
+                return {row: i, column: index + lines[ i ].length + newlineLength};
+        }
+        return {row: l - 1, column: index + lines[ l - 1 ].length + newlineLength};
+    };
+
 
 }

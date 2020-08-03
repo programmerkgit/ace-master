@@ -1,25 +1,58 @@
 var keyUtil = require('../lib/keys');
 var event = require('../lib/event');
 
+
 class KeyBinding {
 
     $handlers: any[] = [];
+    $defaultHandler: any;
 
     constructor(
-        public editor: any
+        public editor: any & { commands: any }
     ) {
+        this.setDefaultHandler(editor.commands);
     }
 
-    getKeyBoardHandler() {
+    getKeyboardHandler() {
         return this.$handlers[ this.$handlers.length - 1 ];
     }
 
-    removeKeyHandler(kb: any) {
+    setDefaultHandler(kb: any) {
+        this.removeKeyboardHandler(this.$defaultHandler);
+        this.$defaultHandler = kb;
+        this.addKeyboardHandler(kb, 0);
+    }
+
+    removeKeyboardHandler(kb: any) {
         const i = this.$handlers.indexOf(kb);
         if (i === -1)
             return false;
         this.$handlers.splice(i, 1);
         return true;
+    }
+
+    addKeyboardHandler(kb: any, pos?: number) {
+        const i = this.$handlers.indexOf(kb);
+        /**
+         * Delete if kb already exists
+         * */
+        if (i != -1)
+            this.$handlers.splice(i, 1);
+        /**
+         * add kb to position
+         * */
+        if (pos === undefined || pos === null)
+            this.$handlers.push(kb);
+        if (typeof pos === 'number')
+            this.$handlers.splice(pos, 0, kb);
+    }
+
+    setKeyboardHandler(kb: any) {
+        if (this.getKeyboardHandler() == kb)
+            return;
+        while (this.getKeyboardHandler() && this.getKeyboardHandler() != this.$defaultHandler)
+            this.removeKeyboardHandler(this.getKeyboardHandler());
+        this.addKeyboardHandler(kb);
     }
 }
 

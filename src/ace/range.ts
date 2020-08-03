@@ -5,7 +5,16 @@ export class Range {
     start: Point;
     end: Point;
 
-    constructor(startRow: number, startColumn: number, endRow: number, endColumn: number) {
+    /**
+     * Range is consist of start and end point.
+     * Start point and End point has column, and row.
+     * */
+    constructor(
+        startRow: number,
+        startColumn: number,
+        endRow: number,
+        endColumn: number
+    ) {
         this.start = {
             column: startColumn,
             row: startRow
@@ -16,6 +25,11 @@ export class Range {
         };
     }
 
+    /**
+     * Creates and returns a new `Range` based on the row and column of the given parametesrs.
+     * @param start A starting point to use
+     * @param end An ending point to use
+     * */
     static fromPoints(start: Point, end: Point): Range {
         return new Range(start.row, start.column, end.row, end.column);
     }
@@ -42,6 +56,10 @@ export class Range {
         return a.column == b.column && a.row === b.row;
     }
 
+    /**
+     * Check equality of Range.
+     * If start and end matches, both ranges are equal.
+     **/
     isEqual(range: Range): boolean {
         return this.start.column === range.start.column &&
             this.start.row === range.start.row &&

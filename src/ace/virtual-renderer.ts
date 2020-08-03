@@ -1,4 +1,5 @@
 import { EventEmitter } from './lib/event-emitter';
+import { dom } from './lib/dom';
 
 
 type Theme = string;
@@ -15,7 +16,6 @@ export class VirtualRenderer extends EventEmitter {
         restartTimer: Function
         element: HTMLElement
     } = {} as any;
-    private readonly container: HTMLElement;
     private readonly scroller: HTMLElement = VirtualRenderer.createScroller();
     private readonly gutter: HTMLElement = VirtualRenderer.createGutter();
 
@@ -23,14 +23,20 @@ export class VirtualRenderer extends EventEmitter {
      * @param container is a container of virtual renderer. if container is not specified, "div" element is a container
      * @param theme - theme of virtual renderer??
      * */
-    constructor(container?: HTMLElement, theme?: Theme) {
+    constructor(
+        public readonly container: HTMLElement = dom.createElement('div'),
+        theme?: Theme
+    ) {
         super();
-        this.container = container || document.createElement('div');
         /* gutter */
-        this.container.appendChild(this.gutter);
+        container.appendChild(this.gutter);
         /* scroll */
-        this.container.appendChild(this.scroller);
+        container.appendChild(this.scroller);
         this.scroller.appendChild(this.content);
+    }
+
+    private static createGutterLayer() {
+
     }
 
     private static createScroller(): HTMLElement {
@@ -40,7 +46,8 @@ export class VirtualRenderer extends EventEmitter {
     }
 
     private static createGutter(): HTMLElement {
-        const gutter = document.createElement('div');
+        const gutter = dom.createElement('div');
+        gutter.className = 'ace_gutter';
         gutter.setAttribute('aria-hidden', 'true');
         return gutter;
     };

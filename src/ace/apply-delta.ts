@@ -1,10 +1,10 @@
-import { Delta, Point } from './document';
+import { Delta, Position } from './document';
 
 
 export const applyDelta = function (docLines: string[], delta: Delta, doNotValidate: boolean): void {
     switch (delta.action) {
         case 'insert':
-            insertDelta(docLines, delta.start, delta.lines,);
+            insertDelta(docLines, delta.start, delta.$lines,);
             break;
         case 'remove':
             removeDelta(docLines, delta.start, delta.end);
@@ -14,7 +14,7 @@ export const applyDelta = function (docLines: string[], delta: Delta, doNotValid
     }
 };
 
-function insertDelta(docLines: string[], start: Point, lines: string[],) {
+function insertDelta(docLines: string[], start: Position, lines: string[],) {
     const row = start.row;
     const startColumn = start.column;
     const line = docLines[ row ] || '';
@@ -33,7 +33,7 @@ function insertDelta(docLines: string[], start: Point, lines: string[],) {
     }
 }
 
-function removeDelta(docLines: string[], start: Point, end: Point) {
+function removeDelta(docLines: string[], start: Position, end: Position) {
     const endColumn = end.column;
     const endRow = end.row;
     const row = start.row;
