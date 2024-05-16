@@ -8,6 +8,23 @@ export type Position = {
     column: number
 }
 
+/**
+ * Delta is difference. What lines and where inserted or removed.
+ *
+ * Delta.start is point of change
+ * Delta.end is end of inserted characters
+ * Delta.$lines is inserted lines.
+ * If you inserted "abc\ndef" in between first and second line,
+ * start:row: 1, start:column:0,
+ * end.row: 2, end.column: 3
+ * lines: ["abc", "def"]
+ *
+ * ```
+ * firstline
+ * secondline
+ * ```
+ * */
+
 export type Delta = {
     action: 'insert' | 'remove',
     $lines: string[],
@@ -24,20 +41,25 @@ export type Delta = {
  * */
 export class Document extends EventEmitter {
     tokenArray: string[] = [];
+    $autoNewLine?: string;
     private readonly $lines = [ '' ];
     private autoNewLine: string = '';
     private $newLineMode = 'auto';
 
+    /**
+     * Lines are text or lines
+     *
+     * */
     constructor(lines: string | string[]) {
         super();
-        if (typeof lines === 'string') {
-
-        } else {
-
-        }
-        /* ensure line has at least one char */
         if (this.$lines.length === 0) {
             this.$lines = [ '' ];
+        } else if (Array.isArray(lines)) {
+            /* When lines are array, no need for detect new Line */
+            this.insertMergedLines({row: 0, column: 0}, lines);
+        } else {
+            /* When lines are text and first time to insert, necessary to detect new line */
+            this.insertAndDetectNewLine({row: 0, column: 0}, lines);
         }
     }
 
@@ -96,17 +118,6 @@ export class Document extends EventEmitter {
         return this.$lines.length;
     }
 
-    positionToIndex(pos: Position, startRow: number = 0) {
-        const lines = this.getAllLines();
-        const newlineLength = this.getNewLineCharacter().length;
-        let index = 0;
-        const row = Math.min(pos.row, lines.length);
-        for (let i = startRow; i < row; i++) {
-            index += lines[ i ].length + newlineLength;
-        }
-        return index + pos.column;
-    }
-
     getLinesForRange(range: Range): string[] {
         if (range.start.row === range.end.row) {
             return [ this.getLine(range.start.row).substring(range.start.column, range.end.column) ];
@@ -157,7 +168,6 @@ export class Document extends EventEmitter {
         };
     }
 
-
     /**
      * Applies `delta` to the document.
      * @param delta - A delta object (can include "insert" and "remove" actions)
@@ -182,8 +192,9 @@ export class Document extends EventEmitter {
 
     }
 
-
     /**
+     * Fixed postion so that position is Valid
+     * TODO: Why length is this.getLength() || this.getLength() - 1 ?
      * point to lines
      * [abc
      *  edf
@@ -195,7 +206,6 @@ export class Document extends EventEmitter {
      * row undefined, column undefined => 3, 3
      * */
     clippedPos(row: number, column: number): Position {
-        /* Linesの中におさまるぽじしょん */
         const length = this.getLength();
         row = Math.min(Math.max(row, 0), this.getLength());
         let line = this.getLine(row);
@@ -209,18 +219,28 @@ export class Document extends EventEmitter {
         this.insert({row: 0, column: 0}, text);
     }
 
-    insert(position, text: string) {
+    /**
+     * detectNewLine before insertMergedLines
+     *
+     * */
+    insertAndDetectNewLine(position: Position, text: string) {
         if (this.getLength() <= 1)
             this.$detectNewLine(text);
         return this.insertMergedLines(position, this.$split(text));
     }
 
+    $detectNewLine(text: string) {
+        var match = text.match(/^.*?(\r?\n)/m);
+        if (match) {
+            this.$autoNewLine = match[ 1 ];
+        } else {
+            this.$autoNewLine = '\n';
+        }
+    };
+
     remove(rage: Range) {
     }
 
-    insertMergedLines(position, lines: any[]) {
-
-    }
 
     /**
      * clone position

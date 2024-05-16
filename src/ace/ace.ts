@@ -20,9 +20,9 @@
  * Background structure is editted.
  * All element is automatically created in the foront.
  * selection is on the background and
-*
-* Brings the current `textInput` into focus.
-this.focus = function () {
+ *
+ * Brings the current `textInput` into focus.
+ this.focus = function () {
     // focusing after timeout is not needed now, but some code using ace
     // depends on being able to call focus when textarea is not visible,
     // so to keep backwards compatibility we keep this until the next major release
@@ -33,27 +33,13 @@ this.focus = function () {
     });
     this.textInput.focus();
 };
-*/
+ */
 
-class Range {
-}
-
-class Editor {
-}
-
-class EditSession {
-    constructor(...args: any[]) {
-    }
-
-    setUndoManager(manager: UndoManager) {
-    }
-}
-
-class UndoManager {
-}
-
-class Renderer {
-}
+import { Document } from './document';
+import { EditSession } from './edit-session';
+import { UndoManager } from './undo-manager';
+import { Editor } from './editor';
+import { VirtualRenderer } from './virtual-renderer';
 
 /**
  * Ace has three methods
@@ -69,15 +55,12 @@ class Renderer {
  * version config.version
  * */
 
-
+/**
+ * Ace is editor instance
+ *
+ * TODO: what is createEditSession?
+ * */
 class Ace {
-    createEditSession(text: Document | string, mode?: any): EditSession {
-        /* Edit sessionを作るとともに  undomanagerをセット。 */
-        const doc = new EditSession(text, mode);
-        doc.setUndoManager(new UndoManager());
-        return doc;
-    }
-
     static getElementByIdOrThrow(element: string): Element {
         const el = document.getElementById(element);
         if (!el)
@@ -117,10 +100,21 @@ class Ace {
     }
 
     /**
-     * element is identifier or element
+     *
+     *
+     *
+     * */
+    createEditSession(text: Document | string, mode?: any): EditSession {
+        const doc = new EditSession(text, mode);
+        doc.setUndoManager(new UndoManager());
+        return doc;
+    }
+
+    /**
+     * Create ace instance.
+     * @param element element is query string or Element class.
      * */
     edit(element: Element | string, options: any): Editor {
-
         /* set element */
         let el: Element = typeof element === 'string' ?
             Ace.getElementByIdOrThrow(element) : element;
@@ -133,12 +127,26 @@ class Ace {
 
         /* todo: know createEditSession */
         const doc = this.createEditSession(value);
+        const editor = new Editor(new VirtualRenderer(el), doc, options);
 
         window.addEventListener('resize', () => {
             /* TODO: env.onResize eidor.resize */
         });
+        const env: any = {};
+
+
         /* editor.ondestory, remove listnner of winwdow */
         /* return Editor */
+        /*
+        * When window resized, resize event occur
+        * */
+        event.addEventListner(window, 'resize', env.onReize);
+        editor.container.env = editr.env = env;
+        editor.on('destory', () => {
+            event.removeListner(window, 'resize', env.onReize);
+            env.editor.container.nev = null; // prevent memory leak
+        });
+        return editor;
     }
 }
 

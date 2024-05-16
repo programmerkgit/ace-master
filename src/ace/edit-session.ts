@@ -1,4 +1,5 @@
 import { Event, EventEmitter } from './lib/event-emitter';
+import { UndoManager } from './undo-manager';
 
 const initialFoldData: any[] = [];
 initialFoldData.toString = function () {
@@ -6,6 +7,16 @@ initialFoldData.toString = function () {
 };
 const config: any = {};
 
+/**
+ * Document is object which contains text data
+ *
+ * */
+
+
+/**
+ * Stores all the data abount [[Editor `Editor`]]
+ *
+ * */
 export class EditSession extends EventEmitter {
 
     static uid = 0;
@@ -42,6 +53,10 @@ export class EditSession extends EventEmitter {
     constructor(text: any, mode: any) {
         super();
         this.addEventListener('changeFold', this.onChangeFold);
+    }
+
+    setUndoManager(manager: UndoManager) {
+
     }
 
     highlight(a: string) {

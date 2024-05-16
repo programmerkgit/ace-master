@@ -5,22 +5,35 @@
 import { VirtualRenderer } from './virtual-renderer';
 import { EditSession } from './edit-session';
 import { EventEmitter } from './lib/event-emitter';
+import { CommandManager } from './commands/command-manager';
+import { useragent } from './lib/useragent';
+import { commands as defaultCommands } from './commands/default_commands';
+import { KeyBinding } from './key-bindings';
+import { Delta } from './document';
 
 export class Editor extends EventEmitter {
     static $uid = 0;
-    renderer: VirtualRenderer;
     mouseHandler = {
         focusTimeout: 0
     };
+    $toDestroy = [];
     highlightTagPending: boolean = false;
     cursorLayer?: HTMLElement;
     session?: EditSession;
+    commands: CommandManager = new CommandManager(useragent.isMac ? 'mac' : 'win', defaultCommands);
+    $search = new Search().set({wrap: true});
+    keyBinding = new KeyBinding(this);
+
     private id = 'editor' + ++Editor.$uid;
 
-    constructor(renderer: VirtualRenderer, session?: EditSession) {
+    constructor(
+        public renderer: VirtualRenderer,
+        session?: EditSession,
+        options: any = {}
+    ) {
         super();
-        this.renderer = renderer;
-        /* each editor should be unique */
+        const container = renderer.getContainerElement();
+        this.commands.on('exec', this.$historyTracker);
     }
 
     setOption(key: string, value: boolean | number) {
@@ -68,5 +81,24 @@ export class Editor extends EventEmitter {
            this.setOptions(options);
        config._signal("editor", this);
        * */
+
+    setSession(session: EditSession) {
+        /* ignore if already session is set */
+        if (this.session == session)
+            return;
+        /*  ??*/
+        if (this.curOp) this.endOperation();
+        this.curOp = {};
+        const oldSession = this.session;
+        if (this.session) {
+            this.session.off('change', this.$onDocumentChange);
+        }
+    }
+
+    onDocumentChange(delta: Delta) {
+        const wrap: boolean = this.session.$useWrapMode;
+        const lastRow = (delta.start.row == delta.end.row ? delta.end.row : Infinity);
+        this.renderer.updateLines(delta.start.row, lastRow, wrap)
+    }
 
 }

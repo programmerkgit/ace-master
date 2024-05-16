@@ -18,7 +18,7 @@ var EventEmitter = require('../lib/event_emitter').EventEmitter;
  *
  **/
 
-class CommandManager {
+export class CommandManager {
     constructor(platform: 'mac' | 'win', commands: Command[]) {
     }
 }

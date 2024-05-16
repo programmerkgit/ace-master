@@ -3379,7 +3379,7 @@ oop.inherits(Mode, TextMode);
                 return "";
             var marker = match[2];
             if (!marker)
-                marker = parseInt(match[3], 10) + 1 + ".";
+                arker = parseInt(match[3], 10) + 1 + ".";
             return match[1] + marker + match[4];
         } else {
             return this.$getIndent(line);
